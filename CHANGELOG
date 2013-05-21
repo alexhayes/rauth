@@ -3,12 +3,25 @@ Rauth Changelog
 
 This provides a list of changes to rauth by release.
 
+Changes in Version 0.6.0
+------------------------
+
+  * Added Python 3 support
+
+  * BUGFIX Corrected double encoding of oauth_token where urllib quote already
+  quotes
+
+  * Requests updated to 1.2.0
+
+  * BUGFIX Corrected overloading mutable type references in signature
 
 Changes in Version 0.5.4
+------------------------
 
   * BUGFIX Corrected adding header to OAuth 2.0 where no access token existed
 
 Changes in Version 0.5.3
+------------------------
 
   * Added an ad hoc check against double signing in OAuth 1.0/a
 
