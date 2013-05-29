@@ -9,7 +9,7 @@
 from rauth.session import OAuth1Session, OAuth2Session, OflySession
 from rauth.utils import ENTITY_METHODS, parse_utf8_qsl
 
-from rauth.compat import quote, urlencode
+from rauth.compat import urlencode
 
 
 PROCESS_TOKEN_ERROR = ('Decoder failed to handle {key} with data as returned '
