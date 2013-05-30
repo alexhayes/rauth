@@ -25,7 +25,7 @@ import rauth
 import requests
 
 import json
-
+import pickle
 
 class OAuth1ServiceTestCase(RauthTestCase, RequestMixin, HttpMixin):
     consumer_key = '000'
@@ -306,3 +306,13 @@ class OAuth1ServiceTestCase(RauthTestCase, RequestMixin, HttpMixin):
         self.response.content = resp
         s = self.service.get_auth_session('foo', 'bar')
         self.assertIsInstance(s, OAuth1Session)
+
+    def test_pickle_session(self):
+        d = pickle.dumps(self.session)
+        session = pickle.loads(d)
+        # Add the fake request back to the session
+        session.request = self.fake_request
+        r = session.request('GET', 
+                      'http://example.com/', 
+                      header_auth=True)
+        self.assert_ok(r)

@@ -21,6 +21,7 @@ from urlparse import parse_qsl, urlsplit
 from mock import patch
 
 import requests
+import pickle
 
 
 class OflyServiceTestCase(RauthTestCase, RequestMixin, HttpMixin):
@@ -163,3 +164,14 @@ class OflyServiceTestCase(RauthTestCase, RequestMixin, HttpMixin):
     def test_get_auth_session(self):
         s = self.service.get_auth_session('foo')
         self.assertIsInstance(s, OflySession)
+
+    def test_pickle_session(self):
+        d = pickle.dumps(self.session)
+        session = pickle.loads(d)
+        # Add the fake request back to the session
+        session.request = self.fake_request
+        r = self.session.request('GET',
+                                 'http://example.com/',
+                                 user_id=self.user_id,
+                                 hash_meth='md5')
+        self.assert_ok(r)

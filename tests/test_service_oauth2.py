@@ -20,6 +20,7 @@ from mock import patch
 import requests
 
 import json
+import pickle
 
 
 class OAuth2ServiceTestCase(RauthTestCase, RequestMixin, HttpMixin):
@@ -136,3 +137,14 @@ class OAuth2ServiceTestCase(RauthTestCase, RequestMixin, HttpMixin):
             'access_token=123&expires_in=3600&refresh_token=456'
         s = self.service.get_auth_session()
         self.assertIsInstance(s, OAuth2Session)
+
+    def test_pickle_session(self):
+        d = pickle.dumps(self.session)
+        session = pickle.loads(d)
+        # Add the fake request back to the session
+        session.request = self.fake_request
+        r = session.request('GET', 
+                      'http://example.com/', 
+                      bearer_auth=True)
+        self.assert_ok(r)
+
