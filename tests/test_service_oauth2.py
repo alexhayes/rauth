@@ -7,12 +7,11 @@
 '''
 
 from base import RauthTestCase
-from test_service import HttpMixin, RequestMixin
+from test_service import HttpMixin, ServiceMixin, RequestMixin
 
 from rauth.service import OAuth2Service
 from rauth.session import OAUTH2_DEFAULT_TIMEOUT, OAuth2Session
-
-from urlparse import parse_qsl
+from rauth.compat import basestring, parse_qsl
 
 from copy import deepcopy
 from mock import patch
@@ -23,7 +22,8 @@ import json
 import pickle
 
 
-class OAuth2ServiceTestCase(RauthTestCase, RequestMixin, HttpMixin):
+class OAuth2ServiceTestCase(RauthTestCase, ServiceMixin, HttpMixin,
+                            RequestMixin):
     client_id = '000'
     client_secret = '111'
     access_token = '123'
@@ -75,7 +75,7 @@ class OAuth2ServiceTestCase(RauthTestCase, RequestMixin, HttpMixin):
         if isinstance(kwargs.get('params', {}), basestring):
             kwargs['params'] = dict(parse_qsl(kwargs['params']))
 
-        if bearer_auth:
+        if bearer_auth and self.access_token is not None:
             bearer_token = 'Bearer {token}'.format(token=self.access_token)
             bearer_header = {'Authorization': bearer_token}
             kwargs.setdefault('headers', {})
@@ -139,12 +139,9 @@ class OAuth2ServiceTestCase(RauthTestCase, RequestMixin, HttpMixin):
         self.assertIsInstance(s, OAuth2Session)
 
     def test_pickle_session(self):
-        d = pickle.dumps(self.session)
-        session = pickle.loads(d)
+        session = pickle.loads(pickle.dumps(self.session))
+
         # Add the fake request back to the session
         session.request = self.fake_request
-        r = session.request('GET', 
-                      'http://example.com/', 
-                      bearer_auth=True)
+        r = session.request('GET', 'http://example.com/', header_auth=True)
         self.assert_ok(r)
-
